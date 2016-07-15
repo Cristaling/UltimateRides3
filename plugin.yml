@@ -1,0 +1,8 @@
+name: UltimateRides
+main: me.cristaling.UltimateRides.UltimateRides
+version: 2.0
+author: cristaling
+commands:
+   uride:
+      description: Ultimate Rides Commands
+      usage: /<command>
