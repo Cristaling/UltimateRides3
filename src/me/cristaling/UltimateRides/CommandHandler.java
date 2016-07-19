@@ -1,5 +1,6 @@
 package me.cristaling.UltimateRides;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -30,6 +31,8 @@ public class CommandHandler implements CommandExecutor {
 		this.plugin = plugin;
 	}
 
+	List<ArmorStand> showList = new ArrayList<ArmorStand>();
+	
 	@Override
 	public boolean onCommand(CommandSender senderOfCommand, Command cmd, String label, String[] args) {
 
@@ -367,7 +370,20 @@ public class CommandHandler implements CommandExecutor {
 										path.getPathPosition((double) i).toLocation(send.getWorld()),
 										EntityType.ARMOR_STAND);
 								entity.setGravity(false);
+								showList.add(entity);
 							}
+							return true;
+						}
+						if (args.length == 2 && args[1].equalsIgnoreCase("unshow")) {
+							if (!send.hasPermission("uride.create")) {
+								send.sendMessage(ChatColor.RED + "You don't have permission to do that");
+								return true;
+							}
+							send.sendMessage(ChatColor.DARK_GREEN + "Unshowing Path");
+							for(ArmorStand ar:showList){
+								ar.remove();
+							}
+							showList.clear();
 							return true;
 						}
 						if (args.length >= 2 && args[1].equalsIgnoreCase("child")) {
@@ -537,6 +553,7 @@ public class CommandHandler implements CommandExecutor {
 					send.sendMessage(ChatColor.GOLD + "/uride element select <Name>");
 					send.sendMessage(ChatColor.GOLD + "/uride element exit <boolean>");
 					send.sendMessage(ChatColor.GOLD + "/uride element show (only paths)");
+					send.sendMessage(ChatColor.GOLD + "/uride element unshow");
 					send.sendMessage(ChatColor.GOLD + "/uride element speed <integer> (rotors)");
 					send.sendMessage(ChatColor.GOLD + "/uride element speed <double> (paths)");
 					send.sendMessage(ChatColor.GOLD + "/uride element child list");
