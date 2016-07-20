@@ -619,6 +619,11 @@ public class CommandHandler implements CommandExecutor {
 				pre += "| ";
 			}
 			toShow = pre + "|[" + ChatColor.DARK_GREEN + ID + ChatColor.GOLD + "] " + element.getType().toString();
+			if(plugin.rideMaster.selectedElement.containsKey(send)){
+				if(element == plugin.rideMaster.selectedElement.get(send)){
+					toShow = pre + "|[" + ChatColor.DARK_GREEN + ID + ChatColor.GOLD + "] " + ChatColor.DARK_GREEN + element.getType().toString();
+				}
+			}
 		}
 		if (!element.getChildren().isEmpty()) {
 			toShow += ":";
