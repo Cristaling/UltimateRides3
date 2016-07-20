@@ -32,7 +32,7 @@ public class CommandHandler implements CommandExecutor {
 	}
 
 	List<ArmorStand> showList = new ArrayList<ArmorStand>();
-	
+
 	@Override
 	public boolean onCommand(CommandSender senderOfCommand, Command cmd, String label, String[] args) {
 
@@ -78,6 +78,22 @@ public class CommandHandler implements CommandExecutor {
 							plugin.rideMaster.selectedElement.put(send, ride);
 							// plugin.rideMaster.creatingRide.put(send, ride);
 							send.sendMessage(ChatColor.GOLD + "Ride created successfuly");
+							return true;
+						}
+						if (args.length == 3 && args[1].equalsIgnoreCase("show")) {
+							if (!send.hasPermission("uride.create")) {
+								send.sendMessage(ChatColor.RED + "You don't have permission to do that");
+								return true;
+							}
+							if (!plugin.rideMaster.rides.containsKey(args[2])) {
+								send.sendMessage(ChatColor.RED + "There is no ride with the given name");
+								return true;
+							}
+							Ride ride = plugin.rideMaster.rides.get(args[2]);
+							send.sendMessage(ChatColor.GOLD + "Showing ride" + ChatColor.DARK_GREEN + " " + args[2]);
+							displayElementInChat(send, ride, 0, 0);
+							// plugin.rideMaster.creatingRide.put(send, ride);
+							send.sendMessage(ChatColor.GOLD + "Ride displayed successfuly");
 							return true;
 						}
 						if (args.length == 3 && args[1].equalsIgnoreCase("start")) {
@@ -205,8 +221,7 @@ public class CommandHandler implements CommandExecutor {
 								send.sendMessage(ChatColor.RED + "You are already creating a structure");
 								return true;
 							}
-							plugin.rideMaster.creatingStructure.put(send,
-									new ComplexStructureBuilder());
+							plugin.rideMaster.creatingStructure.put(send, new ComplexStructureBuilder());
 							send.sendMessage(ChatColor.GOLD + "Structure creation started successfuly");
 							return true;
 						}
@@ -259,9 +274,9 @@ public class CommandHandler implements CommandExecutor {
 								return true;
 							}
 							int result = plugin.rideMaster.creatingStructure.get(send).build();
-							if(result == -1){
+							if (result == -1) {
 								send.sendMessage(ChatColor.RED + "Structure build failed");
-							}else{
+							} else {
 								send.sendMessage(ChatColor.GOLD + "Structure built successfuly with ID " + result);
 							}
 							return true;
@@ -380,7 +395,7 @@ public class CommandHandler implements CommandExecutor {
 								return true;
 							}
 							send.sendMessage(ChatColor.DARK_GREEN + "Unshowing Path");
-							for(ArmorStand ar:showList){
+							for (ArmorStand ar : showList) {
 								ar.remove();
 							}
 							showList.clear();
@@ -463,11 +478,13 @@ public class CommandHandler implements CommandExecutor {
 									send.sendMessage(ChatColor.RED + "You are don't have an element selected");
 									return true;
 								}
-								if(args.length == 5 && args[3].equalsIgnoreCase(MoveableType.STRUCTURE.toString())){
-									try{
+								if (args.length == 5 && args[3].equalsIgnoreCase(MoveableType.STRUCTURE.toString())) {
+									try {
 										int a = Integer.parseInt(args[4]);
 										Moveable parent = plugin.rideMaster.selectedElement.get(send);
-										parent.addChild(ComplexStructureBuilder.spawnComplexStructure(parent.getOrigin().toLocation(send.getWorld()), ComplexStructureBuilder.getTemplate(a)));
+										parent.addChild(ComplexStructureBuilder.spawnComplexStructure(
+												parent.getOrigin().toLocation(send.getWorld()),
+												ComplexStructureBuilder.getTemplate(a)));
 										send.sendMessage(ChatColor.GOLD + "Structure added successfuly");
 										return true;
 									} catch (Exception e) {
@@ -539,6 +556,7 @@ public class CommandHandler implements CommandExecutor {
 				if (send.hasPermission("uride.create")) {
 					send.sendMessage(ChatColor.GOLD + "/uride ride create <Name>");
 					send.sendMessage(ChatColor.GOLD + "/uride ride delete <Name>");
+					send.sendMessage(ChatColor.GOLD + "/uride ride show <Name>");
 					send.sendMessage(ChatColor.GOLD + "/uride path create");
 					send.sendMessage(ChatColor.GOLD + "/uride path add");
 					send.sendMessage(ChatColor.GOLD + "/uride path remove");
@@ -566,7 +584,7 @@ public class CommandHandler implements CommandExecutor {
 				}
 				return true;
 			}
-			if(senderOfCommand instanceof BlockCommandSender){
+			if (senderOfCommand instanceof BlockCommandSender) {
 				if (args.length >= 1) {
 					if (args[0].equalsIgnoreCase("ride")) {
 						if (args.length == 3 && args[1].equalsIgnoreCase("start")) {
@@ -590,4 +608,28 @@ public class CommandHandler implements CommandExecutor {
 		}
 		return true;
 	}
+
+	public void displayElementInChat(Player send, Moveable element, int layer, int ID) {
+		String pre = "";
+		String toShow = "";
+		if (layer == 0) {
+			toShow = element.getType().toString();
+		} else {
+			for (int i = 1; i <= layer; i++) {
+				pre += "| ";
+			}
+			toShow = pre + "|[" + ChatColor.DARK_GREEN + ID + ChatColor.GOLD + "] " + element.getType().toString();
+		}
+		if (!element.getChildren().isEmpty()) {
+			toShow += ":";
+		}
+		send.sendMessage(ChatColor.GOLD + toShow);
+		for (Moveable child : element.getChildren()) {
+			displayElementInChat(send, child, layer + 1, element.getChildren().indexOf(child));
+		}
+		/*if (!element.getChildren().isEmpty()) {
+			send.sendMessage(ChatColor.GOLD + pre + "|===");
+		}*/
+	}
+
 }
