@@ -19,6 +19,7 @@ import me.cristaling.UltimateRides.builders.ComplexStructureBuilder;
 import me.cristaling.UltimateRides.builders.CustomPathBuilder;
 import me.cristaling.UltimateRides.moveables.ArrayMove;
 import me.cristaling.UltimateRides.moveables.CustomPath;
+import me.cristaling.UltimateRides.moveables.EmptyMoveable;
 import me.cristaling.UltimateRides.moveables.EntityMove;
 import me.cristaling.UltimateRides.moveables.Ride;
 import me.cristaling.UltimateRides.moveables.RotorMove;
@@ -535,6 +536,17 @@ public class CommandHandler implements CommandExecutor {
 										return true;
 									} catch (Exception e) {
 										// e.printStackTrace();
+										send.sendMessage(ChatColor.RED + "Invalid Command");
+										return true;
+									}
+								}
+								if (args.length == 4 && args[3].equalsIgnoreCase(MoveableType.EMPTY.toString())) {
+									try {
+										Moveable parent = plugin.rideMaster.selectedElement.get(send);
+										parent.addChild(new EmptyMoveable(parent.getOrigin()));
+										send.sendMessage(ChatColor.GOLD + "EmptyMoveable added successfuly");
+										return true;
+									} catch (Exception e) {
 										send.sendMessage(ChatColor.RED + "Invalid Command");
 										return true;
 									}

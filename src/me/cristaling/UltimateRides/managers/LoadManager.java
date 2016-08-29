@@ -21,6 +21,7 @@ import me.cristaling.UltimateRides.builders.ComplexStructureBuilder;
 import me.cristaling.UltimateRides.moveables.ArrayMove;
 import me.cristaling.UltimateRides.moveables.ComplexStructureMove;
 import me.cristaling.UltimateRides.moveables.CustomPath;
+import me.cristaling.UltimateRides.moveables.EmptyMoveable;
 import me.cristaling.UltimateRides.moveables.EntityMove;
 import me.cristaling.UltimateRides.moveables.Ride;
 import me.cristaling.UltimateRides.moveables.RotorMove;
@@ -119,6 +120,11 @@ public class LoadManager {
 			saveFile.set(masterPath + ".Speed", mover.getSpeed());
 			saveFile.set(masterPath + ".Angle", mover.getAngle());
 			saveFile.set(masterPath + ".ClockWise", mover.isClockWise());
+		}
+		if(element.getType().equals(MoveableType.EMPTY)){
+			EmptyMoveable mover = (EmptyMoveable) element;
+			saveFile.set(masterPath + ".MoveType", "empty");
+			saveFile.set(masterPath + ".Origin", Serializer.vectorToString(mover.getOrigin()));
 		}
 		if(element.getType().equals(MoveableType.PATH)){
 			CustomPath mover = (CustomPath) element;
@@ -223,6 +229,15 @@ public class LoadManager {
 			int childrenNumber = loadFile.get().getInt(masterPath + ".ChildrenNumber");
 			for(int i=0;i<childrenNumber;i++){
 				mover.addChild(loadElement(loadFile, masterPath + ".Children."+String.valueOf(i), world), loadFile.get().getDouble(masterPath + ".ChildrenProgress." + String.valueOf(i)));
+			}
+			return mover;
+		}
+		if(moveType.equalsIgnoreCase(MoveableType.EMPTY.toString())){
+			Vector origin = Serializer.stringToVector(loadFile.get().getString(masterPath + ".Origin"));
+			EmptyMoveable mover = new EmptyMoveable(origin);
+			int childrenNumber = loadFile.get().getInt(masterPath + ".ChildrenNumber");
+			for(int i=0;i<childrenNumber;i++){
+				mover.addChild(loadElement(loadFile, masterPath + ".Children."+String.valueOf(i), world));
 			}
 			return mover;
 		}
